@@ -4,16 +4,9 @@ import XYAxis from '../utils/xy-axis.js';
 import Bar from '../utils/bar.js';
 import { transition } from 'd3-transition';
 
-const Barchart = () => {
-  const [data, setData] = useState([
-    { name: 'Older', value: 60 },
-    { name: 'Jan 01-08', value: 50 },
-    { name: 'Jan 09-16', value: 80 },
-    { name: 'Jan 17-24', value: 55 },
-    { name: 'Jan 25-31', value: 40 },
-    { name: 'Future', value: 20 },
-  ]);
-
+const Barchart = (bar) => {
+  
+  const data=bar.bar.bar
   const parentWidth = 500;
   const margin = {
     top: 10,

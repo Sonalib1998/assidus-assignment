@@ -4,16 +4,8 @@ import XYAxis from '../utils/xy-axis.js';
 import Bar2 from '../utils/bar2.js';
 import { transition } from 'd3-transition';
 
-const Barchart2 = () => {
-  const [data, setData] = useState([
-    { name: 'Sun', cashIn: 100, cashOut: 50 },
-    { name: 'Mon', cashIn: 50, cashOut: 30 },
-    { name: 'Tue', cashIn: 500, cashOut: 200 },
-    { name: 'Wed', cashIn: 300, cashOut: 150 },
-    { name: 'Thu', cashIn: 200, cashOut: 100 },
-    { name: 'Fri', cashIn: 20, cashOut: 10 },
-  ]);
-
+const Barchart2 = (bardata) => {
+  const data=bardata.bardata.bardata
 
   const parentWidth = 500;
   const margin = {
