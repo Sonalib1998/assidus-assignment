@@ -3,6 +3,7 @@ import { select, selectAll } from 'd3-selection';
 import { transition } from 'd3-transition';
 
 function Line({ xScale, yScale, data, lineGenerator }) {
+  console.log(data)
   const ref = useRef();
 
   useEffect(() => {

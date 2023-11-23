@@ -1,9 +1,7 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect} from "react";
 import Card from "@mui/material/Card";
 
 import CardContent from "@mui/material/CardContent";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
 import Grid from "@mui/material/Grid";
 import AccountWatchlist from "./AccountWatchlist";
 
@@ -12,6 +10,8 @@ import Barchart from "./barchart";
 import Barchart2 from "./barchart2";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 function createData(name, baseValue) {
   function getRandomNumber(min, max) {
@@ -25,7 +25,10 @@ function createData(name, baseValue) {
 
   return {
     name,
-    thismonth: roundToDecimal(getRandomNumber(baseValue - 50, baseValue + 50), 2),
+    thismonth: roundToDecimal(
+      getRandomNumber(baseValue - 50, baseValue + 50),
+      2
+    ),
     ytd: roundToDecimal(getRandomNumber(baseValue * 0.5, baseValue * 1.5), 1),
   };
 }
@@ -34,8 +37,6 @@ function Dashboard() {
   const gridStyle = {
     margin: " 5px 5px 10px 200px",
   };
-  const [selectedValue1, setSelectedValue1] = useState("Manage");
-  const [selectedValue2, setSelectedValue2] = useState("January");
   
   const [data, setData] = useState([
     { name: "09", value: 30 },
@@ -50,61 +51,57 @@ function Dashboard() {
     { name: "18", value: 55 },
   ]);
   const [bardata, setBarData] = useState([
-    { name: 'Sun', cashIn: 100, cashOut: 50 },
-    { name: 'Mon', cashIn: 50, cashOut: 30 },
-    { name: 'Tue', cashIn: 500, cashOut: 200 },
-    { name: 'Wed', cashIn: 300, cashOut: 150 },
-    { name: 'Thu', cashIn: 200, cashOut: 100 },
-    { name: 'Fri', cashIn: 20, cashOut: 10 },
+    { name: "Sun", cashIn: 100, cashOut: 50 },
+    { name: "Mon", cashIn: 50, cashOut: 30 },
+    { name: "Tue", cashIn: 500, cashOut: 200 },
+    { name: "Wed", cashIn: 300, cashOut: 150 },
+    { name: "Thu", cashIn: 200, cashOut: 100 },
+    { name: "Fri", cashIn: 20, cashOut: 10 },
   ]);
   const [bar, setBar] = useState([
-    { name: 'Sun', value: 100 },
-    { name: 'Mon', value: 50 },
-    { name: 'Tue', value: 500 },
-    { name: 'Wed', value: 300 },
-    { name: 'Thu', value: 200 },
-    { name: 'Fri', value: 20 },
+    { name: "Sun", value: 100 },
+    { name: "Mon", value: 50 },
+    { name: "Tue", value: 500 },
+    { name: "Wed", value: 300 },
+    { name: "Thu", value: 200 },
+    { name: "Fri", value: 20 },
   ]);
   const [rows, setRows] = useState([
-    createData('Sales', 159),
-    createData('Advertising', 237),
-    createData('Inventory', 262),
-    createData('Entertainment', 305),
-    createData('Product', 356),
+    createData("Sales", 159),
+    createData("Advertising", 237),
+    createData("Inventory", 262),
+    createData("Entertainment", 305),
+    createData("Product", 356),
   ]);
   const randomData = () => {
-    const account = data.map((d) => ({
-      name: d.name,
-      value: Math.floor(Math.random() * 100 + 1),
+    
+    const account = dataa.map((d) => ({
+      name: d.date,
+      value: d.value.delta7.confirmed,
     }));
+    console.log(account)
     setData(account);
-    const invoice = bar.map(obj => ({
+    const invoice = bar.map((obj) => ({
       name: obj.name,
-      value: Math.floor(Math.random() * 500 + 1)
+      value: Math.floor(Math.random() * 500 + 1),
     }));
     setBar(invoice);
-    const cashInOut = bardata.map(item => ({
+    const cashInOut = bardata.map((item) => ({
       ...item,
       cashIn: Math.random() * 100,
       cashOut: Math.random() * 50,
     }));
     setBarData(cashInOut);
-    const tableData = rows.map(row => createData(row.name, row.thismonth));
+    const tableData = rows.map((row) => createData(row.name, row.thismonth));
     setRows(tableData);
   };
-  
-  const handleChange1 = (event) => {
-    randomData();
-    setSelectedValue1(event.target.value);
-  };
+
   const handleChange3 = (event) => {
     randomData();
   };
 
-  const handleChange2 = (event) => {
-    randomData();
-    setSelectedValue2(event.target.value);
-  };
+
+
   const [isPopupOpen, setPopupOpen] = useState(false);
 
   const handleOpen = () => {
@@ -120,6 +117,50 @@ function Dashboard() {
     const file = event.target.files[0];
     setSelectedFile(file);
   };
+
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    randomData();
+  };
+  const [selectedDate2, setSelectedDate2] = useState(null);
+
+  const handleDateChange2 = (date) => {
+    setSelectedDate2(date);
+    randomData();
+  };
+
+  const [dataa, setDataa] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('https://data.covid19india.org/v4/min/timeseries.min.json');
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const result = await response.json();
+        const mapFromObject = new Map(Object.entries(result.BR.dates));
+  
+      const filteredMap = new Map(
+        Array.from(mapFromObject.keys())
+          .filter(key => new Date(key).toLocaleDateString() >= new Date(selectedDate).toLocaleDateString() && new Date(key).toLocaleDateString() <= new Date(selectedDate2).toLocaleDateString())
+          .map(key => [key, mapFromObject.get(key)])
+      );
+      const dataArray = Array.from(filteredMap.entries()).map(([key, value]) => ({ date: key, value }));
+
+      setDataa(dataArray);
+      console.log(dataArray,filteredMap)
+      } catch (error) {
+        setError(error.message);
+      }
+    };
+  
+    fetchData();
+  }, [selectedDate2, selectedDate]);
+  
   return (
     <div className="card-container" style={gridStyle}>
       <Grid container spacing={2}>
@@ -148,25 +189,19 @@ function Dashboard() {
             >
               <h3>Checking account</h3>
               <div style={{ display: "flex", alignItems: "center" }}>
-                <Select
-                  value={selectedValue1}
-                  onChange={handleChange1}
-                  label="Dropdown 1"
-                  style={{ margin: "2px" }}
-                >
-                  <MenuItem value="Manage">Manage</MenuItem>
-                  <MenuItem value="option2">Other</MenuItem>
-                </Select>
-                <Select
-                  value={selectedValue2}
-                  onChange={handleChange2}
-                  label="Dropdown 2"
-                  style={{ margin: "2px" }}
-                >
-                  <MenuItem value="January">January</MenuItem>
-                  <MenuItem value="February">February</MenuItem>
-                  <MenuItem value="March">March</MenuItem>
-                </Select>
+                <DatePicker
+                  selected={selectedDate}
+                  onChange={handleDateChange}
+                  dateFormat="yyyy-MM-dd"
+                  placeholderText="Select a date"
+                />
+                <DatePicker
+                  selected={selectedDate2}
+                  onChange={handleDateChange2}
+                  dateFormat="yyyy-MM-dd"
+                  placeholderText="Select a date"
+                />
+
               </div>
             </div>
             <CardContent style={{ flexGrow: 1 }}>
@@ -199,7 +234,7 @@ function Dashboard() {
               </Button>
             </div>
             <CardContent style={{ flexGrow: 1 }}>
-              <Barchart bar={{ bar }}  />
+              <Barchart bar={{ bar }} />
             </CardContent>
           </Card>
         </Grid>
@@ -257,7 +292,7 @@ function Dashboard() {
               </div>
             </div>
             <CardContent style={{ flexGrow: 1 }}>
-              <Barchart2 bardata={{ bardata }}  />
+              <Barchart2 bardata={{ bardata }} />
             </CardContent>
           </Card>
         </Grid>
@@ -266,7 +301,7 @@ function Dashboard() {
           <Card style={{ height: "100%", padding: "5px" }}>
             <h3>Account Watchlist</h3>
             <CardContent>
-              <AccountWatchlist rows={rows}/>
+              <AccountWatchlist rows={rows} />
             </CardContent>
           </Card>
         </Grid>

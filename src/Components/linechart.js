@@ -6,6 +6,7 @@ import XYAxis from '../utils/xy-axis';
 import Line from '../utils/line'; 
 
 function LineChart(linedata) {
+  console.log(linedata)
  const data=linedata.linedata.data
   const parentWidth = 500;
 
