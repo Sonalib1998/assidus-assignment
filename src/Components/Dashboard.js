@@ -50,6 +50,18 @@ function Dashboard() {
     { name: "17", value: 100 },
     { name: "18", value: 55 },
   ]);
+  const [data2, setData2] = useState([
+    { name: "09", value: 30 },
+    { name: "10", value: 10 },
+    { name: "11", value: 50 },
+    { name: "12", value: 200 },
+    { name: "13", value: 80 },
+    { name: "14", value: 30 },
+    { name: "15", value: 10 },
+    { name: "16", value: 20 },
+    { name: "17", value: 10 },
+    { name: "18", value: 55 },
+  ]);
   const [bardata, setBarData] = useState([
     { name: "Sun", cashIn: 100, cashOut: 50 },
     { name: "Mon", cashIn: 50, cashOut: 30 },
@@ -79,8 +91,12 @@ function Dashboard() {
       name: d.date,
       value: d.value.delta7.confirmed,
     }));
-    console.log(account)
     setData(account);
+    const lineData = dataa.map((d) => ({
+      name: d.date,
+      value: d.value.delta7.recovered,
+    }));
+    setData2(lineData);
     const invoice = bar.map((obj) => ({
       name: obj.name,
       value: Math.floor(Math.random() * 500 + 1),
@@ -144,15 +160,15 @@ function Dashboard() {
         const result = await response.json();
         const mapFromObject = new Map(Object.entries(result.BR.dates));
   
-      const filteredMap = new Map(
-        Array.from(mapFromObject.keys())
-          .filter(key => new Date(key).toLocaleDateString() >= new Date(selectedDate).toLocaleDateString() && new Date(key).toLocaleDateString() <= new Date(selectedDate2).toLocaleDateString())
-          .map(key => [key, mapFromObject.get(key)])
-      );
-      const dataArray = Array.from(filteredMap.entries()).map(([key, value]) => ({ date: key, value }));
-
-      setDataa(dataArray);
-      console.log(dataArray,filteredMap)
+        const filteredMap = new Map(
+          Array.from(mapFromObject.keys())
+            .filter(key => new Date(key).toLocaleDateString() >= new Date(selectedDate).toLocaleDateString() && new Date(key).toLocaleDateString() <= new Date(selectedDate2).toLocaleDateString())
+            .map(key => [key, mapFromObject.get(key)])
+        );
+        const dataArray = Array.from(filteredMap.entries()).map(([key, value]) => ({ date: key, value }));
+  
+        setDataa(dataArray);
+        console.log(dataArray, filteredMap);
       } catch (error) {
         setError(error.message);
       }
@@ -161,6 +177,7 @@ function Dashboard() {
     fetchData();
   }, [selectedDate2, selectedDate]);
   
+
   return (
     <div className="card-container" style={gridStyle}>
       <Grid container spacing={2}>
@@ -203,9 +220,47 @@ function Dashboard() {
                 />
 
               </div>
+             
             </div>
+            <div style={{ display: "flex", alignItems: "center" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    margin: "10px",
+                  }}
+                >
+                  <div
+                    style={{
+                      backgroundColor: "#14C503",
+                      width: "15px",
+                      height: "15px",
+                      margin: "5px",
+                    }}
+                  ></div>
+                  <span>Confirmed</span>
+                </div>
+                {/* Second Legend */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    margin: "10px",
+                  }}
+                >
+                  <div
+                    style={{
+                      backgroundColor: "lightgreen",
+                      width: "15px",
+                      height: "15px",
+                      margin: "5px",
+                    }}
+                  ></div>
+                  <span>Recovered</span>
+                </div>
+              </div>
             <CardContent style={{ flexGrow: 1 }}>
-              <Line linedata={{ data }} />
+              <Line data1={data} data2={data2} />
             </CardContent>
           </Card>
         </Grid>
